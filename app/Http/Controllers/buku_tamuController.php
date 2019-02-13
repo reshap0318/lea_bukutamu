@@ -203,6 +203,9 @@ class buku_tamuController extends Controller
           $pengunjung->nim = $request->nim;
           $pengunjung->keperluan = $request->keperluan;
           if($request->lainnya){
+            if($request->lainnya=='Lainnya' || $request->lainnya=='lainnya'){
+              return ['eror'=>'Tidak Boleh Memasukan Lainnya','pesan'=>'eror'];
+            }
             $pengunjung->keperluan = $request->lainnya;
           }
           $pengunjung->save();
