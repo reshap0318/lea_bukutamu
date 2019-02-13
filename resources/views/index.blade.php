@@ -21,6 +21,7 @@
 	<link href="{{asset('knight/css/animate.css')}}" rel="stylesheet" type="text/css">
 
 	<script type="text/javascript" src="{{asset('knight/js/jquery.1.8.3.min.js')}}"></script>
+
 	<script type="text/javascript" src="{{asset('knight/js/bootstrap.js')}}"></script>
 	<script type="text/javascript" src="{{asset('knight/js/jquery-scrolltofixed.js')}}"></script>
 	<script type="text/javascript" src="{{asset('knight/js/jquery.easing.1.3.js')}}"></script>
@@ -37,13 +38,14 @@
 	<!-- <link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" type="text/css"> -->
 	<link href="{{asset('css/dataTables.bootstrap.min.css')}}" rel="stylesheet" type="text/css">
 	<link href="{{asset('css/buttons.dataTables.min.css')}}" rel="stylesheet" type="text/css">
-	<script type="text/javascript">
-      $.ajaxSetup({
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-        });
-    </script>
+  <script type="text/javascript">
+    $.ajaxSetup({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+      });
+  </script>
+
 
 	<!-- =======================================================
     Theme Name: Knight
@@ -95,7 +97,7 @@
 	        <div class="form">
 	          <div id="sendmessage">Your message has been sent. Thank you!</div>
 	          <div id="errormessage"></div>
-						{{ Form::open(array('url' => 'isi_buku','role'=>'form')) }}
+						{{ Form::open(array('role'=>'form','id'=>'absensi')) }}
 	            <div class="row">
 								<div class="form-group col-lg-5 col-sm-5">
 		              <input type="text" name="nim" class="form-control input-text" id="nim" placeholder="Masukan Nomor Induk Mahasiswa" data-rule="minlen:10" data-msg="Masukan NIM Dengan Benar" />
@@ -112,7 +114,7 @@
 		              <div class="validation"></div>
 		            </div>
 								<div class="col-lg-2 col-sm-2">
-		            	<div class="text-center"><button type="submit" class="input-btn">Simpan</button></div>
+		            	<div class="text-center"><button id="tombol" type="submit" class="input-btn">Simpan</button></div>
 								</div>
 	            </div>
 	          {{ Form::close() }}
@@ -123,6 +125,7 @@
 			                <th class="text-center" style="width:30px">No</th>
 			                <th class="text-center">Nama</th>
 			                <th class="text-center">Tujuan</th>
+			                <th class="text-center">Waktu</th>
 			            </tr>
 			        </thead>
 			        <tbody>
@@ -134,7 +137,7 @@
 							</tbody>
 							<tfoot>
 								<tr>
-										<th colspan="2" class="text-center">Total Pengunjung</th>
+										<th colspan="3" class="text-center">Total Pengunjung</th>
 										<th class="text-center" id="totalakhir">0 Orang</th>
 		            </tr>
 							</tfoot>
@@ -176,7 +179,6 @@
 					<div id="app2">
             {!! $chart_tujuan->container() !!}
 	        </div>
-	        <script src="https://unpkg.com/vue"></script>
 	        <script>
 	            var app = new Vue({
 	                el: '#app2',
@@ -185,14 +187,12 @@
 					@php
 						$chart_tujuan->api_url = '';
 					@endphp
-	        <script src=https://cdnjs.cloudflare.com/ajax/libs/echarts/4.0.2/echarts-en.min.js charset=utf-8></script>
 	        {!! $chart_tujuan->script() !!}
 				</div>
 				<div class="col-lg-6 col-sm-6 featured-work">
 					<div id="app3">
             {!! $chart_pengunjung_terbiasa->container() !!}
 	        </div>
-	        <script src="https://unpkg.com/vue"></script>
 	        <script>
 	            var app = new Vue({
 	                el: '#app3',
@@ -201,7 +201,6 @@
 					@php
 						$chart_pengunjung_terbiasa->api_url = '';
 					@endphp
-	        <script src=https://cdnjs.cloudflare.com/ajax/libs/echarts/4.0.2/echarts-en.min.js charset=utf-8></script>
 	        {!! $chart_pengunjung_terbiasa->script() !!}
 				</div>
 			</div>
@@ -255,65 +254,67 @@
 	}
 
 	var total = document.getElementById('totalakhir');
+	var url = "{{url('pengunjung-data')}}";
 
 		$(document).ready(function() {
 			var t = $('#example').DataTable({
-				"ajax": "{{url('pengunjung-data')}}",
-	      "columns": [
+				"processing": true,
+				"ajax": url,
+			  "columns": [
 						{ "data": "nama"},
-	          { "data": "nama"},
-	          { "data": "keperluan"},
-	      ],
+			      { "data": "nama"},
+			      { "data": "keperluan"},
+			      { "data": "created_at"},
+			  ],
 				"order": [[ 1, 'asc' ]],
-	      "ordering": false,
-	      "info":     false,
+			  "ordering": false,
+			  "info":     false,
 				dom: 'Bfrtip',
 				buttons: [
 						{
 								text: '1 Hari',
 								action: function ( e, dt, node, config ) {
-	                t.ajax.url("{{url('pengunjung-data')}}?data=1").load();
-	              }
+			            t.ajax.url("{{url('pengunjung-data')}}?data=1").load();
+			          }
 						},
 						{
 								text: '30 Hari',
 								action: function ( e, dt, node, config ) {
-	                t.ajax.url("{{url('pengunjung-data')}}?data=30").load();
-	              }
+			            t.ajax.url("{{url('pengunjung-data')}}?data=30").load();
+			          }
 						},
 						{
 								text: '365 Hari',
 								action: function ( e, dt, node, config ) {
-	                t.ajax.url("{{url('pengunjung-data')}}?data=365").load();
-	              }
+			            t.ajax.url("{{url('pengunjung-data')}}?data=365").load();
+			          }
 						}
 				],
 
 				"footerCallback": function ( row, data, start, end, display ) {
-            var api = this.api(), data;
+			      var api = this.api(), data;
 
-            // Remove the formatting to get integer data for summation
-            var intVal = function ( i ) {
-                return typeof i === 'string' ?
-                    i.replace(/[\$,]/g, '')*1 :
-                    typeof i === 'number' ?
-                        i : 0;
-            };
+			      // Remove the formatting to get integer data for summation
+			      var intVal = function ( i ) {
+			          return typeof i === 'string' ?
+			              i.replace(/[\$,]/g, '')*1 :
+			              typeof i === 'number' ?
+			                  i : 0;
+			      };
 
-            // Total over all pages
-            total = api
-                .column( 2 )
-                .data()
-                .reduce( function (a, b) {
-                    return intVal(a) + 1;
-                }, 0 );
+			      // Total over all pages
+			      total = api
+			          .column( 3 )
+			          .data()
+			          .reduce( function (a, b) {
+			              return intVal(a) + 1;
+			          }, 0 );
 
-            // Update footer
-            $( api.column( 2 ).footer() ).html(
-                total +' Orang'
-            );
-        }
-
+			      // Update footer
+			      $( api.column( 3 ).footer() ).html(
+			          total +' Orang'
+			      );
+			  }
 			});
 
 			t.on( 'order.dt search.dt', function () {
@@ -322,6 +323,34 @@
 	        } );
 	    } ).draw();
 
+			$('#absensi').on('submit', function(event){
+				event.preventDefault();
+				var form_data = $(this).serialize();
+				$.ajax({
+				    url:"{{ url('isi_buku') }}",
+				    type: "POST",
+				    data:form_data,
+				    dataType:"json",
+				    success:function(data)
+				    {
+								toastr.options.progressBar = true;
+				        if(data.pesan=='eror'){
+									for (var i = 0; i < data.eror.length; i++) {
+										toastr.error(data.eror[i], 'Eror', {timeOut: 5000});
+									}
+								}else if(data.pesan=='success'){
+									for (var i = 0; i < data.success.length; i++) {
+										toastr.success(data.success[i], 'Berhasil', {timeOut: 5000});
+									}
+									$('#nim').val('');
+									$('#absensi')[0].reset();
+									gantiyak();
+									location.reload();
+								}
+								$('#example').DataTable().ajax.reload();
+				    }
+				})
+			});
 		});
 
 	</script>

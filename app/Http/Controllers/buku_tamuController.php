@@ -7,6 +7,7 @@ use DB;
 use App\mahasiswa;
 use App\pengunjung;
 use App\Charts\Echarts;
+use Validator;
 
 class buku_tamuController extends Controller
 {
@@ -157,14 +158,14 @@ class buku_tamuController extends Controller
 
     public function dataajax(Request $request)
     {
-        $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('day(pengunjung.created_at) = day(now())')->get();
+        $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan','pengunjung.created_at')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('day(pengunjung.created_at) = day(now())')->get();
 
         if($request->data==1){
-          $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('day(pengunjung.created_at) = day(now())')->get();
+          $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan','pengunjung.created_at')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('day(pengunjung.created_at) = day(now())')->get();
         }else if($request->data==30){
-          $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('`pengunjung`.`created_at` between DATE_SUB(now(), INTERVAL 30 day) and now()')->get();
+          $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan','pengunjung.created_at')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('`pengunjung`.`created_at` between DATE_SUB(now(), INTERVAL 30 day) and now()')->get();
         }else if($request->data==365){
-          $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('`pengunjung`.`created_at` between DATE_SUB(now(), INTERVAL 365 day) and now()')->get();
+          $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan','pengunjung.created_at')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('`pengunjung`.`created_at` between DATE_SUB(now(), INTERVAL 365 day) and now()')->get();
         }
         return '{"data" : '.json_encode($pengunjungs).'}';
     }
@@ -172,16 +173,30 @@ class buku_tamuController extends Controller
     public function isi(Request $request)
     {
         if($request->lainnya){
-          $request->validate([
-            'nim' => 'required',
-            'lainnya' => 'required'
+          $validation = Validator::make($request->all(), [
+              'nim' => 'required',
+              'lainnya' => 'required'
           ]);
         }else{
-          $request->validate([
+          $validation = Validator::make($request->all(), [
             'nim' => 'required',
             'keperluan' => 'required'
           ]);
         }
+
+        $error_array = array();
+        $success_output = '';
+        if ($validation->fails())
+        {
+            foreach($validation->messages()->getMessages() as $field_name => $messages)
+            {
+                $error_array[] = $messages;
+            }
+            return ['eror'=>$error_array,'pesan'=>'eror'];
+        }
+
+
+
 
         try {
           $pengunjung = new pengunjung;
@@ -191,13 +206,10 @@ class buku_tamuController extends Controller
             $pengunjung->keperluan = $request->lainnya;
           }
           $pengunjung->save();
-          toast()->success('Selamat Datang '.$pengunjung->mahasiswa->nama, 'Berhasil');
-          return redirect('/');
+          return ['success'=>['Selamat Datang '.$pengunjung->mahasiswa->nama],'pesan'=>'success'];
         } catch (\Exception $e) {
-          toast()->error($e->getPrevious()->getMessage(), 'Error');
-          return redirect()->back();
+          return ['eror'=>['Terjadi Eror Saat Memasukan Data','Masukan Data NIM Dengan Benar'],'pesan'=>'eror'];
         }
-
     }
 
     public function dataset(Request $request)
