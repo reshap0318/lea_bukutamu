@@ -15,7 +15,7 @@ class buku_tamuController extends Controller
     public function index()
     {
         $tujuans = pengunjung::select('keperluan')->distinct()->pluck('keperluan','keperluan');
-        $pengunjung = DB::SELECT(DB::RAW("select DATE_FORMAT(created_at, '%d/%m/%Y') as tanggal, count(id) as total from pengunjung GROUP BY tanggal"));
+        $pengunjung = DB::SELECT(DB::RAW("select DATE_FORMAT(created_at, '%d/%m/%Y') as tanggal, count(id) as total from pengunjung GROUP BY tanggal ORDER BY DATE_FORMAT(created_at, '%Y%m%d') asc"));
         $keperluan = DB::SELECT(DB::RAW("select keperluan, count(id) as total from pengunjung GROUP BY keperluan"));
         $keaktivan = DB::SELECT(DB::RAW("select users.nama as nama, count(pengunjung.id) as total from pengunjung JOIN users on pengunjung.nim = users.nim GROUP BY nama ORDER BY total desc limit 5"));
 
