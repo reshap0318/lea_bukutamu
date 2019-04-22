@@ -158,10 +158,10 @@ class buku_tamuController extends Controller
 
     public function dataajax(Request $request)
     {
-        $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan','pengunjung.created_at')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('day(pengunjung.created_at) = day(now())')->get();
+        $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan','pengunjung.created_at')->join('users','pengunjung.nim','=','users.nim')->WhereRaw("DATE_FORMAT(pengunjung.created_at,'%Y%m%d') =DATE_FORMAT(now(),'%Y%m%d')")->get();
 
         if($request->data==1){
-          $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan','pengunjung.created_at')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('day(pengunjung.created_at) = day(now())')->get();
+          $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan','pengunjung.created_at')->join('users','pengunjung.nim','=','users.nim')->WhereRaw("DATE_FORMAT(pengunjung.created_at,'%Y%m%d') =DATE_FORMAT(now(),'%Y%m%d')")->get();
         }else if($request->data==30){
           $pengunjungs = pengunjung::select('users.nama as nama', 'pengunjung.keperluan as keperluan','pengunjung.created_at')->join('users','pengunjung.nim','=','users.nim')->WhereRaw('`pengunjung`.`created_at` between DATE_SUB(now(), INTERVAL 30 day) and now()')->get();
         }else if($request->data==365){
@@ -204,14 +204,14 @@ class buku_tamuController extends Controller
           $pengunjung->keperluan = $request->keperluan;
           if($request->lainnya){
             if($request->lainnya=='Lainnya' || $request->lainnya=='lainnya'){
-              return ['eror'=>'Tidak Boleh Memasukan Lainnya','pesan'=>'eror'];
+              return ['eror'=>['Tidak Boleh Memasukan Lainnya'],'pesan'=>'eror'];
             }
             $pengunjung->keperluan = $request->lainnya;
           }
           $pengunjung->save();
           return ['success'=>['Selamat Datang '.$pengunjung->mahasiswa->nama],'pesan'=>'success'];
         } catch (\Exception $e) {
-          return ['eror'=>['Terjadi Eror Saat Memasukan Data','Masukan Data NIM Dengan Benar'],'pesan'=>'eror'];
+          return ['eror'=>[$e->getMessage(),'Terjadi Eror Saat Memasukan Data','Masukan Data NIM Dengan Benar'],'pesan'=>'eror'];
         }
     }
 
