@@ -97,7 +97,7 @@
 	        <div class="form">
 	          <div id="sendmessage">Your message has been sent. Thank you!</div>
 	          <div id="errormessage"></div>
-						{{ Form::open(array('role'=>'form','id'=>'absensi')) }}
+						{{ Form::open(array('url' => 'buku_tamu/store', 'role'=>'form','id'=>'absensi')) }}
 	            <div class="row">
 								<div class="form-group col-lg-5 col-sm-5">
 		              <input type="text" name="nim" class="form-control input-text" id="nim" placeholder="Masukan Nomor Induk Mahasiswa" data-rule="minlen:10" data-msg="Masukan NIM Dengan Benar" />
@@ -231,30 +231,23 @@
 
 	<script type="text/javascript">
 
-	@if (count($errors) > 0)
-		@foreach ($errors->all() as $error)
-			toastr.options.progressBar = true;
-			toastr.error("{{ $error }}", 'Eror', {timeOut: 5000});
-		@endforeach
-	@endif
+		var lainnya = $("#lainnya" );
+		var keperluan = $( "#keperluan" );
+		lainnya.hide();
+		lainnya.prop('disabled', true);
 
-
-	var lainnya = $("#lainnya" );
-	var keperluan = $( "#keperluan" );
-	lainnya.hide();
-	lainnya.prop('disabled', true);
-	function gantiyak() {
-		if(keperluan.val()=="lainnya"){
-			lainnya.show();
-			lainnya.prop('disabled', false);
-		}else{
-			lainnya.hide();
-			lainnya.prop('disabled', true);
+		function gantiyak() {
+			if(keperluan.val()=="lainnya"){
+				lainnya.show();
+				lainnya.prop('disabled', false);
+			}else{
+				lainnya.hide();
+				lainnya.prop('disabled', true);
+			}
 		}
-	}
 
-	var total = document.getElementById('totalakhir');
-	var url = "{{url('pengunjung-data')}}";
+		var total = document.getElementById('totalakhir');
+		var url = "{{url('pengunjung-data')}}";
 
 		$(document).ready(function() {
 			var t = $('#example').DataTable({
@@ -357,7 +350,6 @@
 
 	<script type="text/javascript">
 		$(document).ready(function(e) {
-
 			$('#test').scrollToFixed();
 			$('.res-nav_click').click(function() {
 				$('.main-nav').slideToggle();
@@ -380,10 +372,8 @@
 		wow.init();
 	</script>
 
-
 	<script type="text/javascript">
 		$(window).load(function() {
-
 			$('.main-nav li a, .servicelink').bind('click', function(event) {
 				var $anchor = $(this);
 
@@ -404,16 +394,12 @@
 		})
 	</script>
 
-	<script type="text/javascript">
+	<!-- <script type="text/javascript">
 		$(window).load(function() {
-
-
 			var $container = $('.portfolioContainer'),
 				$body = $('body'),
 				colW = 375,
 				columns = null;
-
-
 			$container.isotope({
 				// disable window resizing
 				resizable: true,
@@ -447,7 +433,7 @@
 			});
 
 		});
-	</script>
+	</script> -->
 
 </body>
 

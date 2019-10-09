@@ -231,4 +231,38 @@ class buku_tamuController extends Controller
 
         return $data->api();
     }
+
+    public function store(Request $request)
+    {
+        if($request->lainnya){
+          $request->validate([
+              'nim' => 'required',
+              'lainnya' => 'required'
+          ]);
+        }else{
+          $request->validate([
+            'nim' => 'required',
+            'keperluan' => 'required'
+          ]);
+        }
+
+        try {
+          $pengunjung = new pengunjung;
+          $pengunjung->nim = $request->nim;
+          $pengunjung->keperluan = $request->keperluan;
+          if($request->lainnya){
+            if($request->lainnya=='Lainnya' || $request->lainnya=='lainnya'){
+              return ['eror'=>['Tidak Boleh Memasukan Lainnya'],'pesan'=>'eror'];
+            }
+            $pengunjung->keperluan = $request->lainnya;
+          }
+          $pengunjung->save();
+          toast()->success('Selamat Datang'.$pengunjung->mahasiswa->nama, 'Berhasil');
+        } catch (\Exception $e) {
+          toast()->error($e->getMessage(), 'Error');
+        }
+
+        return redirect('/#buku_tamu');
+
+    }
 }
